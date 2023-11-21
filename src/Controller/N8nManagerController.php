@@ -4,6 +4,7 @@ namespace Pimcorecasts\Bundle\N8nManager\Controller;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
+use Pimcore\Bundle\AdminBundle\Security\ContentSecurityPolicyHandler;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -14,8 +15,14 @@ class N8nManagerController extends AbstractN8nManagerController{
      * @throws GuzzleException
      */
     #[Route('/', name: '-index')]
-    public function indexAction( Client $client ): Response
+    public function indexAction( Client $client, ContentSecurityPolicyHandler $contentSecurityPolicyHandler ): Response
     {
+        $contentSecurityPolicyHandler->addAllowedUrls(ContentSecurityPolicyHandler::SCRIPT_OPT, [
+            'https://cdn.jsdelivr.net/'
+        ]);
+        $contentSecurityPolicyHandler->addAllowedUrls(ContentSecurityPolicyHandler::STYLE_OPT, [
+            'https://cdn.jsdelivr.net/'
+        ]);
 
         $response = $client->get( $_ENV['N8N_HOST'] . '/api/v1/workflows', [
             RequestOptions::HEADERS => [
