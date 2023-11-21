@@ -1,0 +1,20 @@
+{
+    "name": "pimcorecasts/n8n-manager-bundle",
+    "type": "pimcore-bundle",
+    "license": "GPL-3.0",
+    "require": {
+      "pimcore/pimcore": "^11.0"
+    },
+    "autoload": {
+      "psr-4": {
+        "Pimcorecasts\\Bundle\\N8nManager\\": "src/"
+      }
+    },
+    "extra": {
+      "pimcore": {
+        "bundles": [
+          "Pimcorecasts\\Bundle\\N8nManager\\N8nManagerBundle"
+        ]
+      }
+    }
+  }
