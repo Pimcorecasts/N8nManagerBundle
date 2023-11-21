@@ -25,7 +25,7 @@ class N8nManagerController extends AbstractN8nManagerController{
         ]);
         $json = json_decode($response->getBody()->getContents());
 
-        return $this->render('n8n-manager/index.html.twig', [
+        return $this->render('@N8nManager/n8n-manager/index.html.twig', [
             'data' => $json->data
         ]);
     }

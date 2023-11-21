@@ -27,7 +27,7 @@ class N8nManagerExtension extends Extension
     {
         $loader = new Loader\YamlFileLoader(
             $container,
-            new FileLocator(__DIR__.'/../config')
+            new FileLocator(__DIR__ . '/../config')
         );
         $loader->load('services.yaml');
     }
