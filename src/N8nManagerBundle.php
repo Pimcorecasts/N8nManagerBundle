@@ -11,35 +11,36 @@ use Pimcore\Extension\Bundle\AbstractPimcoreBundle;
 
 class N8nManagerBundle extends AbstractPimcoreBundle
 {
-    public function getJsPaths()
+    public function getJsPaths(): array
     {
         return [
         ];
     }
 
-    public function getEditmodeJsPaths()
+    public function getEditmodeJsPaths(): array
     {
         return [
         ];
     }
 
-    public function getCssPaths(){
-        return [
-        ];
-    }
-
-    public function getEditmodeCssPaths()
+    public function getCssPaths(): array
     {
         return [
         ];
     }
 
-    public function getVersion()
+    public function getEditmodeCssPaths(): array
+    {
+        return [
+        ];
+    }
+
+    public function getVersion(): string
     {    
         return \Composer\InstalledVersions::getVersion('pimcorecasts/n8n-manager-bundle');
     }
 
-    public function getDescription()
+    public function getDescription(): string
     {
         return 'N8n Manager Bundle';
     }
