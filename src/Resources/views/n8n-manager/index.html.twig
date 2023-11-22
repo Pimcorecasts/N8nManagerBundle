@@ -12,63 +12,65 @@
         <div class="my-3 p-3 bg-body rounded shadow-sm">
             {% for workflow in workflows %}
 
-                <div class="d-flex text-muted pt-3 border-bottom gap gap-3">
-
-                    <p class="pb-3 mb-0 small lh-sm">
-                        <strong class="d-block text-gray-dark">{{ workflow.name }}</strong>
-                        {{ (workflow.active ? '<span class="badge rounded-pill text-bg-success">ACTIVE</span>' : '<span class="badge rounded-pill text-bg-danger">INACTIVE</span>')|raw }}
-                        | ID: {{ workflow.id }} | created: {{ workflow.createdAt|date('d.m.Y H:i') }} |
-                        updated: {{ workflow.updatedAt|date('d.m.Y H:i') }}
-                    </p>
-                    <div class="pb-3 mb-0 small lh-sm">
-                        <strong class="d-block text-gray-dark">Tags</strong>
-                        {% for tag in workflow.tags %}
-                            <span class="badge rounded-pill bg-secondary">{{ tag }}</span>
-                        {% endfor %}
-                    </div>
-                    {#
-                    <div class="pb-3 mb-0 small lh-sm">
-                        <strong class="d-block text-gray-dark">Nodes</strong>
-                        {% for node in workflow.nodes %}
-                            {% if node.type == 'n8n-nodes-base.scheduleTrigger' %}
-                                <div class="alert alert-info">
-                                    Scheduled:
-                                    <br>
-                                    {% for interval in node.parameters.rule.interval %}
-                                        {% set field = 'days' %}
-                                        {% if interval.field is defined %}
-                                            {% set field = interval.field %}
-                                        {% endif %}
-                                        {% if field == 'cronExpression' %}
-                                            - CRON: {{ interval.expression }} <br>
-                                        {% else %}
-                                            - every {{ interval[field ~ 'Interval']|default(1) }} {{ field }}
-                                            ({{ interval.triggerAtHour|default("00") }}:{{ interval.triggerAtMinute|default("00") }})
-                                            {{ dump(interval) }}
-                                        {% endif %}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                    #}
-                    <div class="pb-3 mb-0 small lh-sm">
-                        <strong class="d-block text-gray-dark">Schedule</strong>
-                        {% for scheduleItem in workflow.schedule %}
-                            {{ dump(scheduleItem) }}
-                        {% endfor %}
-                    </div>
-                    <div class="pb-3 mb-0 small lh-sm">
-                        <strong class="d-block text-gray-dark">Webhooks</strong>
-
-                            {% for webhook in workflow.webhookPaths %}
-                                {% if workflow.active %}
-                                    <a href="{{ workflow.active ? webhook.fullPath : webhook.testPath }}" class="btn btn-warning btn-sm" target="_blank">{{ webhook.name }}</a>
-                                {% else %}
-                                    <button class="btn btn-dark btn-sm" disabled>{{ webhook.name }}</button>
+                <div class="d-flex text-muted pt-3">
+                    <div class="d-flex justify-content-between pb-3 mb-0 small lh-sm border-bottom w-100">
+                        <p class="pb-3 mb-0 small lh-sm">
+                            <strong class="d-block text-gray-dark">{{ workflow.name }}</strong>
+                            {{ (workflow.active ? '<span class="badge rounded-pill text-bg-success">ACTIVE</span>' : '<span class="badge rounded-pill text-bg-danger">INACTIVE</span>')|raw }}
+                            | ID: {{ workflow.id }} | created: {{ workflow.createdAt|date('d.m.Y H:i') }} |
+                            updated: {{ workflow.updatedAt|date('d.m.Y H:i') }}
+                        </p>
+                        <div class="pb-3 mb-0 small lh-sm">
+                            <strong class="d-block text-gray-dark">Tags</strong>
+                            {% for tag in workflow.tags %}
+                                <span class="badge rounded-pill bg-secondary">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        {#
+                        <div class="pb-3 mb-0 small lh-sm">
+                            <strong class="d-block text-gray-dark">Nodes</strong>
+                            {% for node in workflow.nodes %}
+                                {% if node.type == 'n8n-nodes-base.scheduleTrigger' %}
+                                    <div class="alert alert-info">
+                                        Scheduled:
+                                        <br>
+                                        {% for interval in node.parameters.rule.interval %}
+                                            {% set field = 'days' %}
+                                            {% if interval.field is defined %}
+                                                {% set field = interval.field %}
+                                            {% endif %}
+                                            {% if field == 'cronExpression' %}
+                                                - CRON: {{ interval.expression }} <br>
+                                            {% else %}
+                                                - every {{ interval[field ~ 'Interval']|default(1) }} {{ field }}
+                                                ({{ interval.triggerAtHour|default("00") }}:{{ interval.triggerAtMinute|default("00") }})
+                                                {{ dump(interval) }}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
                                 {% endif %}
                             {% endfor %}
+                        </div>
+                        #}
+                        <div class="pb-3 mb-0 small lh-sm">
+                            <strong class="d-block text-gray-dark">Schedule</strong>
+                            {% for scheduleItem in workflow.schedule %}
+                                {{ dump(scheduleItem) }}
+                            {% endfor %}
+                        </div>
+                        <div class="pb-3 mb-0 small lh-sm">
+                            <strong class="d-block text-gray-dark">Webhooks</strong>
+
+                                {% for webhook in workflow.webhookPaths %}
+                                    {% if workflow.active %}
+                                        <a href="{{ workflow.active ? webhook.fullPath : webhook.testPath }}" class="btn btn-warning btn-sm" target="_blank">{{ webhook.name }}</a>
+                                    {% else %}
+                                        <button class="btn btn-dark btn-sm" disabled>{{ webhook.name }}</button>
+                                    {% endif %}
+                                {% endfor %}
+                        </div>
                     </div>
+
 
                 </div>
             {% endfor %}
