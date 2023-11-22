@@ -2,49 +2,76 @@
 
 
 {% block content %}
-<div class="container">
-    <div class="d-flex align-items-center p-3 my-3 text-white bg-primary rounded shadow-sm">
-        <div class="lh-1">
-            <h1 class="h6 mb-0 text-white lh-1">Workflows</h1>
+    <div class="container">
+        <div class="d-flex align-items-center p-3 my-3 text-white bg-primary rounded shadow-sm">
+            <div class="lh-1">
+                <h1 class="h6 mb-0 text-white lh-1">Workflows</h1>
+            </div>
         </div>
-    </div>
 
-    <div class="my-3 p-3 bg-body rounded shadow-sm">
-        {% for workflow in data %}
-            {{ dump(workflow) }}
-            <div class="d-flex text-muted pt-3">
-                <p class="pb-3 mb-0 small lh-sm border-bottom">
-                    <strong class="d-block text-gray-dark">{{ workflow.name }}</strong>
-                    {{ (workflow.active ? '<span class="badge rounded-pill text-bg-success">ACTIVE</span>' : '<span class="badge rounded-pill text-bg-danger">INACTIVE</span>')|raw }} | ID: {{ workflow.id }} | created: {{ workflow.createdAt|date('d.m.Y H:i') }} | updated: {{ workflow.updatedAt|date('d.m.Y H:i') }}
-                </p>
-                <div class="pb-3 mb-0 small lh-sm border-bottom">
-                    <strong class="d-block text-gray-dark">Nodes</strong>
-                    {% for node in workflow.nodes %}
-                        {% if node.type == 'n8n-nodes-base.scheduleTrigger' %}
-                        <div class="alert alert-info">
-                            Scheduled:
-                            <br>
-                            {% for interval in node.parameters.rule.interval %}
-                                {% set field = 'days' %}
-                                {% if interval.field is defined %}
-                                    {% set field = interval.field %}
-                                {% endif %}
-                                {% if field == 'cronExpression' %}
-                                    - CRON: {{ interval.expression }} <br>
+        <div class="my-3 p-3 bg-body rounded shadow-sm">
+            {% for workflow in workflows %}
+
+                <div class="d-flex text-muted pt-3 border-bottom gap gap-3">
+
+                    <p class="pb-3 mb-0 small lh-sm">
+                        <strong class="d-block text-gray-dark">{{ workflow.name }}</strong>
+                        {{ (workflow.active ? '<span class="badge rounded-pill text-bg-success">ACTIVE</span>' : '<span class="badge rounded-pill text-bg-danger">INACTIVE</span>')|raw }}
+                        | ID: {{ workflow.id }} | created: {{ workflow.createdAt|date('d.m.Y H:i') }} |
+                        updated: {{ workflow.updatedAt|date('d.m.Y H:i') }}
+                    </p>
+                    <div class="pb-3 mb-0 small lh-sm">
+                        <strong class="d-block text-gray-dark">Tags</strong>
+                        {% for tag in workflow.tags %}
+                            <span class="badge rounded-pill bg-secondary">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    {#
+                    <div class="pb-3 mb-0 small lh-sm">
+                        <strong class="d-block text-gray-dark">Nodes</strong>
+                        {% for node in workflow.nodes %}
+                            {% if node.type == 'n8n-nodes-base.scheduleTrigger' %}
+                                <div class="alert alert-info">
+                                    Scheduled:
+                                    <br>
+                                    {% for interval in node.parameters.rule.interval %}
+                                        {% set field = 'days' %}
+                                        {% if interval.field is defined %}
+                                            {% set field = interval.field %}
+                                        {% endif %}
+                                        {% if field == 'cronExpression' %}
+                                            - CRON: {{ interval.expression }} <br>
+                                        {% else %}
+                                            - every {{ interval[field ~ 'Interval']|default(1) }} {{ field }}
+                                            ({{ interval.triggerAtHour|default("00") }}:{{ interval.triggerAtMinute|default("00") }})
+                                            {{ dump(interval) }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    #}
+                    <div class="pb-3 mb-0 small lh-sm">
+                        <strong class="d-block text-gray-dark">Schedule</strong>
+                        {% for scheduleItem in workflow.schedule %}
+                            {{ dump(scheduleItem) }}
+                        {% endfor %}
+                    </div>
+                    <div class="pb-3 mb-0 small lh-sm">
+                        <strong class="d-block text-gray-dark">Webhooks</strong>
+
+                            {% for webhook in workflow.webhookPaths %}
+                                {% if workflow.active %}
+                                    <a href="{{ workflow.active ? webhook.fullPath : webhook.testPath }}" class="btn btn-warning btn-sm" target="_blank">{{ webhook.name }}</a>
                                 {% else %}
-{#                                    TODO fix dynamic getter #}
-                                    - every {{ interval[field ~ 'Interval']|default(1) }} {{ field }}
-{#                                    TODO fix for seconds,minutes,hours(onlyminutes) #}
-                                    ({{ interval.triggerAtHour|default("00") }}:{{ interval.triggerAtMinute|default("00") }})
-                                    {{ dump(interval) }}
+                                    <button class="btn btn-dark btn-sm" disabled>{{ webhook.name }}</button>
                                 {% endif %}
                             {% endfor %}
-                        </div>
-                        {% endif %}
-                    {% endfor %}
+                    </div>
+
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
     </div>
-</div>
 {% endblock %}
