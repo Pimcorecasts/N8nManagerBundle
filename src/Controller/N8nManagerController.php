@@ -1,4 +1,5 @@
 <?php
+
 namespace Pimcorecasts\Bundle\N8nManager\Controller;
 
 use GuzzleHttp\Client;
@@ -8,14 +9,15 @@ use Pimcore\Bundle\AdminBundle\Security\ContentSecurityPolicyHandler;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/admin/n8n-manager', name:'n8n-manager-')]
-class N8nManagerController extends AbstractN8nManagerController{
+#[Route('/admin/n8n-manager', name: 'n8n-manager-')]
+class N8nManagerController extends AbstractN8nManagerController
+{
 
     /**
      * @throws GuzzleException
      */
     #[Route('/', name: 'index')]
-    public function indexAction( Client $client, ContentSecurityPolicyHandler $contentSecurityPolicyHandler ): Response
+    public function indexAction(Client $client, ContentSecurityPolicyHandler $contentSecurityPolicyHandler): Response
     {
         $contentSecurityPolicyHandler->addAllowedUrls(ContentSecurityPolicyHandler::SCRIPT_OPT, [
             'https://cdn.jsdelivr.net/'
@@ -24,7 +26,7 @@ class N8nManagerController extends AbstractN8nManagerController{
             'https://cdn.jsdelivr.net/'
         ]);
 
-        $response = $client->get( $_ENV['N8N_HOST'] . '/api/v1/workflows', [
+        $response = $client->get($_ENV['N8N_HOST'] . '/api/v1/workflows', [
             RequestOptions::HEADERS => [
                 'accept' => 'application/json',
                 'X-N8N-API-KEY' => $_ENV['N8N_API_KEY']
@@ -55,75 +57,83 @@ class N8nManagerController extends AbstractN8nManagerController{
                         'fullPath' => $_ENV['N8N_HOST'] . '/webhook/' . $node->parameters->path,
                         'testPath' => $_ENV['N8N_HOST'] . '/webhook-test/' . $node->parameters->path,
                     ];
-                }elseif ($node->type == 'n8n-nodes-base.scheduleTrigger') {
+                } elseif ($node->type == 'n8n-nodes-base.scheduleTrigger') {
                     foreach ($node->parameters->rule->interval as $scheduleItem) {
                         $field = 'days';
-                        if( isset($scheduleItem->field) ) {
+                        if (isset($scheduleItem->field)) {
                             $field = $scheduleItem->field;
                         }
 
-                        if( $field == 'cronExpression'){
+                        if ($field == 'cronExpression') {
                             $schedule[] = [
                                 'type' => 'CRON',
                                 'value' => $scheduleItem->expression
                             ];
-                        }else{
-                            if( $field == 'seconds' ){
-                                /**
-                                 * secondsInterval: 30
-                                 */
+                        } else {
+                            $string = json_encode($scheduleItem);
+                            if (!str_contains($string, '={{')) {
+                                if ($field == 'seconds') {
+                                    /**
+                                     * secondsInterval: 30
+                                     */
+                                    $schedule[] = [
+                                        'type' => 'EVERY - ' . $field,
+                                        'value' => $scheduleItem->secondsInterval ?? 30
+                                    ];
+                                } elseif ($field == 'minutes') {
+                                    /**
+                                     * minutesInterval: 5
+                                     */
+                                    $schedule[] = [
+                                        'type' => 'EVERY - ' . $field,
+                                        'value' => $scheduleItem->minutesInterval ?? 5
+                                    ];
+                                } elseif ($field == 'hours') {
+                                    /**
+                                     * hoursInterval: 1
+                                     * triggerAtMinute: 0
+                                     */
+                                    $schedule[] = [
+                                        'type' => 'EVERY - ' . $field,
+                                        'value' => ($scheduleItem->hoursInterval ?? 1) . 'h:' . ($scheduleItem->triggerAtMinute ?? 0) . 'm'
+                                    ];
+                                } elseif ($field == 'days') {
+                                    /**
+                                     * daysInterval: 1
+                                     * triggerAtHour: 0
+                                     * triggerAtMinute: 0
+                                     */
+                                    $schedule[] = [
+                                        'type' => 'EVERY - ' . $field,
+                                        'value' => ($scheduleItem->daysInterval ?? 1) . 'd:' . ($scheduleItem->triggerAtHour ?? 0) . 'h:' . ($scheduleItem->triggerAtMinute ?? 0) . 'm'
+                                    ];
+                                } elseif ($field == 'weeks') {
+                                    /**
+                                     * weeksInterval: 1
+                                     * triggerAtDay: 0
+                                     * triggerAtHour: 0
+                                     * triggerAtMinute: 0
+                                     */
+                                    $schedule[] = [
+                                        'type' => 'EVERY - ' . $field,
+                                        'value' => ($scheduleItem->weeksInterval ?? 1) . 'w:' . ($scheduleItem->triggerDay ?? 0) . 'd:' . ($scheduleItem->triggerAtHour ?? 0) . 'h:' . ($scheduleItem->triggerAtMinute ?? 0) . 'm'
+                                    ];
+                                } elseif ($field == 'months') {
+                                    /**
+                                     * monthsInterval: 1
+                                     * triggerAtDayOfMonth: 1
+                                     * triggerAtHour: 0
+                                     * triggerAtMinute: 0
+                                     */
+                                    $schedule[] = [
+                                        'type' => 'EVERY - ' . $field,
+                                        'value' => ($scheduleItem->monthsInterval ?? 1) . 'm:' . ($scheduleItem->triggerAtDayOfMonth ?? 1) . 'd:' . ($scheduleItem->triggerAtHour ?? 0) . 'h:' . ($scheduleItem->triggerAtMinute ?? 0) . 'm'
+                                    ];
+                                }
+                            } else {
                                 $schedule[] = [
-                                    'type' => 'EVERY - ' . $field,
-                                    'value' => $scheduleItem->secondsInterval ?? 30
-                                ];
-                            }elseif ($field == 'minutes' ) {
-                                /**
-                                 * minutesInterval: 5
-                                 */
-                                $schedule[] = [
-                                    'type' => 'EVERY - ' . $field,
-                                    'value' => $scheduleItem->minutesInterval ?? 5
-                                ];
-                            }elseif( $field == 'hours' ) {
-                                /**
-                                 * hoursInterval: 1
-                                 * triggerAtMinute: 0
-                                 */
-                                $schedule[] = [
-                                    'type' => 'EVERY - ' . $field,
-                                    'value' => ($scheduleItem->hoursInterval ?? 1) . 'h:' . ($scheduleItem->triggerAtMinute ?? 0) .'m'
-                                ];
-                            }elseif( $field == 'days' ) {
-                                /**
-                                 * daysInterval: 1
-                                 * triggerAtHour: 0
-                                 * triggerAtMinute: 0
-                                 */
-                                $schedule[] = [
-                                    'type' => 'EVERY - ' . $field,
-                                    'value' => ($scheduleItem->daysInterval ?? 1) . 'd:' . ($scheduleItem->triggerAtHour ?? 0) . 'h:' . ($scheduleItem->triggerAtMinute ?? 0) . 'm'
-                                ];
-                            }elseif( $field == 'weeks' ) {
-                                /**
-                                 * weeksInterval: 1
-                                 * triggerAtDay: 0
-                                 * triggerAtHour: 0
-                                 * triggerAtMinute: 0
-                                 */
-                                $schedule[] = [
-                                    'type' => 'EVERY - ' . $field,
-                                    'value' => ($scheduleItem->weeksInterval ?? 1) . 'w:' . ($scheduleItem->triggerDay ?? 0) . 'd:' . ($scheduleItem->triggerAtHour ?? 0) . 'h:' . ($scheduleItem->triggerAtMinute ?? 0) . 'm'
-                                ];
-                            }elseif ( $field == 'months' ) {
-                                /**
-                                 * monthsInterval: 1
-                                 * triggerAtDayOfMonth: 1
-                                 * triggerAtHour: 0
-                                 * triggerAtMinute: 0
-                                 */
-                                $schedule[] = [
-                                    'type' => 'EVERY - ' . $field,
-                                    'value' => ($scheduleItem->monthsInterval ?? 1) . 'm:' . ($scheduleItem->triggerAtDayOfMonth ?? 1) . 'd:' . ($scheduleItem->triggerAtHour ?? 0) . 'h:' . ($scheduleItem->triggerAtMinute ?? 0) . 'm'
+                                    'type' => 'Scheduler: ',
+                                    'value' => 'used n8n Expressions, see n8n'
                                 ];
                             }
                         }
@@ -156,7 +166,7 @@ class N8nManagerController extends AbstractN8nManagerController{
     }
 
     #[Route('/start-workflow/{id}', name: 'start-workflow')]
-    public function startWorkflow( Response $response ): Response
+    public function startWorkflow(Response $response): Response
     {
 
         return $response;
