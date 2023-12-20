@@ -17,7 +17,7 @@
                         <p class="pb-3 mb-0 small lh-sm">
                             <strong class="d-block text-gray-dark">{{ workflow.name }}</strong>
                             {{ (workflow.active ? '<span class="badge rounded-pill text-bg-success">ACTIVE</span>' : '<span class="badge rounded-pill text-bg-danger">INACTIVE</span>')|raw }}
-                            | ID: {{ workflow.id }} | created: {{ workflow.createdAt|date('d.m.Y H:i') }} |
+                            | ID: {{ workflow.id }}<br> created: {{ workflow.createdAt|date('d.m.Y H:i') }} |
                             updated: {{ workflow.updatedAt|date('d.m.Y H:i') }}
                         </p>
                         <div class="pb-3 mb-0 small lh-sm">
@@ -55,8 +55,16 @@
                         <div class="pb-3 mb-0 small lh-sm">
                             <strong class="d-block text-gray-dark">Schedule</strong>
                             {% for scheduleItem in workflow.schedule %}
-                                {{ dump(scheduleItem) }}
+                                {{ scheduleItem.type ~ ' ' ~ scheduleItem.value }}
                             {% endfor %}
+                        </div>
+                        <div class="pb-3 mb-0 small lh-sm">
+                            {% if workflow.lastExecution.data %}
+                                <span class="badge text-success rounded-pill {{ workflow.lastExecution.data.0.finished ? 'bg-success' : 'bg-danger' }}">.</span>
+                                {{ workflow.lastExecution.data.0.stoppedAt|date('d.m.Y H:i') }}
+                            {% else %}
+                                <span class="badge rounded-pill bg-secondary">No executions</span>
+                            {% endif %}
                         </div>
                         <div class="pb-3 mb-0 small lh-sm">
                             <strong class="d-block text-gray-dark">Webhooks</strong>

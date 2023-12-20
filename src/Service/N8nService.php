@@ -11,11 +11,13 @@ class N8nService
 {
     private string $host = '';
     private string $apiKey = '';
+    public mixed $webhookKey = '';
 
     public function __construct(private readonly Client $client)
     {
         $this->host = $_ENV['N8N_HOST'];
         $this->apiKey = $_ENV['N8N_API_KEY'];
+        $this->webhookKey = $_ENV['N8N_WEBHOOK_KEY'];
     }
 
     /**
@@ -225,6 +227,5 @@ class N8nService
 
         return $schedule;
     }
-
 
 }

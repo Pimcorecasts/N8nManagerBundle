@@ -2,6 +2,7 @@
 
 namespace Pimcorecasts\Bundle\N8nManager\Controller;
 
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Pimcore\Bundle\AdminBundle\Security\ContentSecurityPolicyHandler;
 use Pimcorecasts\Bundle\N8nManager\Service\N8nService;
@@ -50,6 +51,7 @@ class N8nManagerController extends AbstractN8nManagerController
                 }
             }
 
+            $lastExecution = $n8nService->getAllExecutions(limit: 1, workflowId: $workflow->id);
 
             $workflows[] = [
                 'id' => $workflow->id,
@@ -60,7 +62,8 @@ class N8nManagerController extends AbstractN8nManagerController
                 'nodes' => $workflow->nodes,
                 'tags' => $tagNames,
                 'webhookPaths' => $webhookPaths,
-                'schedule' => $schedule
+                'schedule' => $schedule,
+                'lastExecution' => $lastExecution
             ];
             //p_r($webhookPaths);
 
@@ -83,5 +86,38 @@ class N8nManagerController extends AbstractN8nManagerController
         $response = $n8nService->activateWorkflow($request->get('id'));
         return $this->json($response);
     }
+
+
+    /**
+     * @throws GuzzleException
+     */
+    #[Route('/start-webhook/{id}', name: 'start-webhook')]
+    public function startWebhook(Request $request, N8nService $n8nService): Response
+    {
+        $workflow = $n8nService->getWorkflow($request->get('id'));
+        $webhookNodeData = null;
+        foreach ($workflow->nodes as $node) {
+            if ($node->type == 'n8n-nodes-base.webhook') {
+                $webhookNodeData = $n8nService->getWebhookNodeArray($node);
+                break;
+            }
+        }
+        if ($webhookNodeData === null) {
+            return $this->json(['error' => 'No webhook node found']);
+        }else{
+            $client = new Client([
+                'headers' => [
+                    'accept' => 'application/json',
+                    'X-Api-Key' => $n8nService->webhookKey
+                ]
+            ]);
+
+            $promise = $client->getAsync($webhookNodeData['fullPath']);
+            $promise->wait(true);
+        }
+
+        return $this->redirect($this->generateUrl('n8n-manager-index'));
+    }
+
 
 }
