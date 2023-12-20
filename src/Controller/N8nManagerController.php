@@ -112,7 +112,12 @@ class N8nManagerController extends AbstractN8nManagerController
                 ]
             ]);
 
-            $promise = $client->getAsync($webhookNodeData['fullPath']);
+            $webhookUrl = $webhookNodeData['fullPath'];
+            if(!$workflow->active){
+                $webhookUrl = $webhookNodeData['testPath'];
+            }
+
+            $promise = $client->getAsync($webhookUrl);
             $promise->wait(true);
         }
 
