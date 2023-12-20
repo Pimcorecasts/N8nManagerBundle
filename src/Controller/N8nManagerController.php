@@ -2,11 +2,10 @@
 
 namespace Pimcorecasts\Bundle\N8nManager\Controller;
 
-use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\RequestOptions;
 use Pimcore\Bundle\AdminBundle\Security\ContentSecurityPolicyHandler;
 use Pimcorecasts\Bundle\N8nManager\Service\N8nService;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -14,6 +13,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class N8nManagerController extends AbstractN8nManagerController
 {
 
+    /**
+     * @throws GuzzleException
+     */
     #[Route('/', name: 'index')]
     public function indexAction(N8nService $n8nService, ContentSecurityPolicyHandler $contentSecurityPolicyHandler): Response
     {
@@ -42,7 +44,7 @@ class N8nManagerController extends AbstractN8nManagerController
             $schedule = [];
             foreach ($workflow->nodes as $node) {
                 if ($node->type == 'n8n-nodes-base.webhook') {
-                    $webhookPaths[] = $n8nService->getWebhookNodeArray($node));
+                    $webhookPaths[] = $n8nService->getWebhookNodeArray($node);
                 } elseif ($node->type == 'n8n-nodes-base.scheduleTrigger') {
                     $schedule = array_merge($schedule, $n8nService->getScheduleNodeArray($node));
                 }
@@ -72,6 +74,9 @@ class N8nManagerController extends AbstractN8nManagerController
         ]);
     }
 
+    /**
+     * @throws GuzzleException
+     */
     #[Route('/activate-workflow/{id}', name: 'activate-workflow')]
     public function activateWorkflow(Request $request, N8nService $n8nService): Response
     {

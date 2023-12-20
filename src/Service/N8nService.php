@@ -3,6 +3,7 @@
 namespace Pimcorecasts\Bundle\N8nManager\Service;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use stdClass;
 
@@ -11,12 +12,15 @@ class N8nService
     private string $host = '';
     private string $apiKey = '';
 
-    public function __construct(private Client $client)
+    public function __construct(private readonly Client $client)
     {
         $this->host = $_ENV['N8N_HOST'];
         $this->apiKey = $_ENV['N8N_API_KEY'];
     }
 
+    /**
+     * @throws GuzzleException
+     */
     public function getWorkflowData(): stdClass
     {
         $response = $this->client->get($this->host . '/api/v1/workflows', [
@@ -28,6 +32,9 @@ class N8nService
         return json_decode($response->getBody()->getContents());
     }
 
+    /**
+     * @throws GuzzleException
+     */
     public function getWorkflow(string $id): stdClass
     {
         $response = $this->client->get($this->host . '/api/v1/workflows/' . $id, [
@@ -39,6 +46,9 @@ class N8nService
         return json_decode($response->getBody()->getContents());
     }
 
+    /**
+     * @throws GuzzleException
+     */
     public function activateWorkflow(string $id): stdClass
     {
         $response = $this->client->put($this->host . '/api/v1/workflows/' . $id . '/activate', [
@@ -50,6 +60,9 @@ class N8nService
         return json_decode($response->getBody()->getContents());
     }
 
+    /**
+     * @throws GuzzleException
+     */
     public function deactivateWorkflow(string $id): stdClass
     {
         $response = $this->client->put($this->host . '/api/v1/workflows/' . $id . '/deactivate', [
@@ -61,6 +74,9 @@ class N8nService
         return json_decode($response->getBody()->getContents());
     }
 
+    /**
+     * @throws GuzzleException
+     */
     public function getAllExecutions(?int $limit = null, ?string $cursor = null, ?string $workflowId = null, ?string $status = null, bool $includeData = false): stdClass
     {
         $options = [
@@ -79,7 +95,7 @@ class N8nService
         if ($workflowId !== null) {
             $query['workflowId'] = $workflowId;
         }
-        if ($status !== null && in_array($status, ['error', 'success', 'waiting'])) {
+        if (in_array($status, ['error', 'success', 'waiting'])) {
             $query['status'] = $status;
         }
         if ($includeData) {
@@ -92,6 +108,9 @@ class N8nService
         return json_decode($response->getBody()->getContents());
     }
 
+    /**
+     * @throws GuzzleException
+     */
     public function getExecution(string $id, bool $includeData = false): stdClass
     {
         $options = [

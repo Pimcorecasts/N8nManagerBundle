@@ -6,10 +6,13 @@ services:
 
     Pimcorecasts\Bundle\N8nManager\Command\:
         resource: '../Command/*'
-        public: true
         tags: [ 'console.command' ]
 
     Pimcorecasts\Bundle\N8nManager\Controller\:
         resource: '../Controller'
         public: true
         tags: [ 'controller.service_arguments' ]
+
+    Pimcorecasts\Bundle\N8nManager\Service\:
+        resource: '../Service'
+        public: true
