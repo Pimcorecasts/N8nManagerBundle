@@ -10,12 +10,12 @@ N8N_API_KEY=your-api-key
 N8N_HOST=host-incl-port-if-necessary
 N8N_WEBHOOK_KEY=custom-webhook-key
 ```
-## Webhook Key
+### Webhook Key
 The webhook key is used to authenticate the webhook calls from n8n.
 This Bundle uses the Key for "Header Auth" in n8n and send it as "X-Api-Key" header to n8n.
 
 
-add bundle in bundles.php
+## Add bundle in bundles.php
 ```php
 return [
     ...
@@ -23,3 +23,6 @@ return [
     ...
 ];
 ```
+
+## Visit N8nManager site
+www.your-domain.com`/admin/n8n-manager/`
