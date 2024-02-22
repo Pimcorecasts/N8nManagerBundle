@@ -5,14 +5,14 @@ services:
         public: false
 
     Pimcorecasts\Bundle\N8nManager\Command\:
-        resource: '../Command/*'
+        resource: '../../Command/*'
         tags: [ 'console.command' ]
 
     Pimcorecasts\Bundle\N8nManager\Controller\:
-        resource: '../Controller'
+        resource: '../../Controller'
         public: true
         tags: [ 'controller.service_arguments' ]
 
     Pimcorecasts\Bundle\N8nManager\Service\:
-        resource: '../Service'
+        resource: '../../Service'
         public: true
