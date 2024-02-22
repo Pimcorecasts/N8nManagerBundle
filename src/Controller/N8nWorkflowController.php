@@ -4,7 +4,7 @@ namespace Pimcorecasts\Bundle\N8nManager\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/n8n', name: 'n8n-workflow-')]
 class N8nWorkflowController extends AbstractN8nManagerController

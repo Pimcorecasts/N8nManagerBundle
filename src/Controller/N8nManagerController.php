@@ -8,7 +8,7 @@ use Pimcore\Bundle\AdminBundle\Security\ContentSecurityPolicyHandler;
 use Pimcorecasts\Bundle\N8nManager\Service\N8nService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/admin/n8n-manager', name: 'n8n-manager-')]
 class N8nManagerController extends AbstractN8nManagerController
@@ -121,7 +121,7 @@ class N8nManagerController extends AbstractN8nManagerController
             $promise->wait(true);
         }
 
-        return $this->redirect($this->generateUrl('n8n-manager-index'));
+        return $this->redirectToRoute('n8n-manager-index');
     }
 
 
