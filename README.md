@@ -23,3 +23,14 @@ return [
     ...
 ];
 ```
+
+
+
+## Development
+### Frontend
+Start Vite continues build while developing
+```bash
+npm run build --watch
+```
+
+Do not forget ro commit the dist folder after building the frontend.
