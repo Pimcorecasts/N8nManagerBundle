@@ -39,7 +39,7 @@ class N8nManagerController extends AbstractN8nManagerController
             $tagNames = [];
 
             foreach ($workflow->tags as $tag) {
-                $tags[] = $tag;
+                $tags[$tag->name] = $tag;
                 $tagNames[] = $tag->name;
             }
 
