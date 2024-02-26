@@ -1,0 +1,7 @@
+{
+    "src/main.js": {
+      "file": "n8nManager.js",
+      "src": "src/main.js",
+      "isEntry": true
+    }
+  }

@@ -8,18 +8,25 @@ use Pimcore\Bundle\AdminBundle\Security\ContentSecurityPolicyHandler;
 use Pimcorecasts\Bundle\N8nManager\Service\N8nService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/admin/n8n-manager', name: 'n8n-manager-')]
 class N8nManagerController extends AbstractN8nManagerController
 {
 
+    public function __construct( protected Profiler $profiler )
+    {
+    }
+
     /**
      * @throws GuzzleException
      */
     #[Route('/', name: 'index')]
-    public function indexAction(N8nService $n8nService, ContentSecurityPolicyHandler $contentSecurityPolicyHandler): Response
+    public function indexAction(Request $request, N8nService $n8nService, ContentSecurityPolicyHandler $contentSecurityPolicyHandler): Response
     {
+        $this->profiler->disable();
+
         $contentSecurityPolicyHandler->addAllowedUrls(ContentSecurityPolicyHandler::SCRIPT_OPT, [
             'https://cdn.jsdelivr.net/'
         ]);
@@ -53,7 +60,7 @@ class N8nManagerController extends AbstractN8nManagerController
 
             $lastExecution = $n8nService->getAllExecutions(limit: 1, workflowId: $workflow->id);
 
-            $workflows[] = [
+            $workflows[$workflow->id] = [
                 'id' => $workflow->id,
                 'name' => $workflow->name,
                 'active' => $workflow->active,
@@ -65,9 +72,21 @@ class N8nManagerController extends AbstractN8nManagerController
                 'schedule' => $schedule,
                 'lastExecution' => $lastExecution
             ];
-            //p_r($webhookPaths);
 
+        }
 
+        // sort workflows by name (initial)
+        if(!empty($workflows)) {
+            uasort($workflows, function ($a, $b) {
+                return $a['name'] <=> $b['name'];
+            });
+        }
+
+        // Filter workflows by tag
+        if ($tag = $request->get('tag')) {
+            $workflows = array_filter($workflows, function ($workflow) use ($tag) {
+                return in_array($tag, $workflow['tags']);
+            });
         }
 
         return $this->render('@N8nManager/n8n-manager/index.html.twig', [
