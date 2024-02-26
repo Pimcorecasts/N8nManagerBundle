@@ -8,7 +8,6 @@ use Pimcore\Bundle\AdminBundle\Security\ContentSecurityPolicyHandler;
 use Pimcorecasts\Bundle\N8nManager\Service\N8nService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\Routing\Attribute\Route;
 
