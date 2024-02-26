@@ -16,7 +16,7 @@ services:
     Pimcorecasts\Bundle\N8nManager\Service\:
         resource: '../../Service'
         public: true
-        
+
     Pimcorecasts\Bundle\N8nManager\Twig\:
-        resource: '../Twig'
+        resource: '../../Twig'
         tags: [twig.extension]
