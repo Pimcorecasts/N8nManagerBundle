@@ -43,7 +43,7 @@ class N8nManagerController extends AbstractN8nManagerController
             $tagNames = [];
 
             foreach ($workflow->tags as $tag) {
-                $tags[] = $tag;
+                $tags[$tag->name] = $tag;
                 $tagNames[] = $tag->name;
             }
 
@@ -88,6 +88,9 @@ class N8nManagerController extends AbstractN8nManagerController
                 return in_array($tag, $workflow['tags']);
             });
         }
+
+        // Unique Tags
+        $tags = array_unique($tags);
 
         return $this->render('@N8nManager/n8n-manager/index.html.twig', [
             'data' => $json->data,
