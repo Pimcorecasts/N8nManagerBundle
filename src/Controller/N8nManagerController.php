@@ -8,16 +8,13 @@ use Pimcore\Bundle\AdminBundle\Security\ContentSecurityPolicyHandler;
 use Pimcorecasts\Bundle\N8nManager\Service\N8nService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Profiler\Profiler;
+
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/admin/n8n-manager', name: 'n8n-manager-')]
 class N8nManagerController extends AbstractN8nManagerController
 {
 
-    public function __construct( protected Profiler $profiler )
-    {
-    }
 
     /**
      * @throws GuzzleException
@@ -25,7 +22,6 @@ class N8nManagerController extends AbstractN8nManagerController
     #[Route('/', name: 'index')]
     public function indexAction(Request $request, N8nService $n8nService, ContentSecurityPolicyHandler $contentSecurityPolicyHandler): Response
     {
-        $this->profiler->disable();
 
         $contentSecurityPolicyHandler->addAllowedUrls(ContentSecurityPolicyHandler::SCRIPT_OPT, [
             'https://cdn.jsdelivr.net/'
