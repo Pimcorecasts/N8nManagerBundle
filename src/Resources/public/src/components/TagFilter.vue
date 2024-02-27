@@ -1,7 +1,6 @@
 <template>
     <form action="">
         <div class="flex flex-row space-x-2">
-            ${selectedTag}
             <select name="tags" id="tags" class="border border-gray-300 rounded-md" v-model="selectedTag" @change="filterTags()">
                 <option value="">All</option>
                 <option v-for="tag in tags" :value="tag.name">${tag.name}</option>
